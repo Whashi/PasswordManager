@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import  messagebox
 from random import randint, choice,  shuffle
 import pyperclip
+import json
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -23,19 +24,25 @@ def generate_password():
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save():
     website = website_entry.get()
-    user = user_entry.get()
+    email = user_entry.get()
     password = password_entry.get()
+    new_data = {
+        website: {
+            "email": email,
+            "password": password
+        }
+    }
 
     if len(website) == 0 or len(password) == 0:
         messagebox.showerror("Oops", "Please don't leave any empty fields")
     else:
-        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail:{user}\nPassword:{password}\nIs it ok to save?")
-
-        if is_ok:
-            with open("db.txt", "a") as f:
-                f.write(f"Website: {website}\nEmail/Username: {user}\nPassword: {password}\n\n***\n\n")
-            website_entry.delete(0, "end")
-            password_entry.delete(0, "end")
+        with open("db.json", "r") as f:
+            data = json.load(f)
+            data.update(new_data)
+        with open("db.json", "w") as f:
+            json.dump(data, f, indent=4)
+        website_entry.delete(0, "end")
+        password_entry.delete(0, "end")
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
